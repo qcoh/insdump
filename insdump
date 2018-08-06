@@ -1,0 +1,18 @@
+#/bin/bash
+
+# References: stackoverflow, iirc
+
+SRC=$(mktemp)
+rm $SRC
+
+echo "section .text" >> $SRC
+echo "global foo" >> $SRC
+echo "foo:" >> $SRC
+echo "$@" >> $SRC
+
+OBJ=$(mktemp)
+rm $OBJ
+
+nasm -felf64 $SRC -o $OBJ
+
+gdb -batch -ex 'file '"$OBJ"'' -ex 'disassemble /r foo' | tail -n 2 | head -n 1
